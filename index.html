@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClipMaster AI - Early Access</title>
+    <title>ClipMaster AI - Real-time Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-black text-white font-sans">
@@ -11,26 +11,30 @@
         <h1 class="text-6xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent italic">
             ClipMaster AI
         </h1>
-        <p class="text-xl mb-8 text-gray-400">Превърни YouTube видеа в TikTok хитове с един клик.</p>
+        <p class="text-xl mb-8 text-gray-400 font-light">Истински AI анализ на твоите видеа.</p>
         
-        <div class="w-full max-w-md bg-gray-900/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm">
+        <div class="w-full max-w-md bg-gray-900/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm shadow-2xl">
             <input id="videoLink" type="text" placeholder="Постави YouTube линк тук..." 
-                   class="w-full p-4 rounded-lg bg-black border border-purple-500 text-white mb-4 focus:outline-none focus:ring-2 ring-purple-600">
+                   class="w-full p-4 rounded-lg bg-black border border-purple-500 text-white mb-4 focus:outline-none focus:ring-2 ring-purple-600 transition-all">
             
-            <button onclick="startAI()" id="mainButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 text-white font-bold py-4 rounded-lg transition-all duration-300 shadow-lg shadow-purple-500/20">
+            <button onclick="analyzeVideo()" id="mainButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 text-white font-bold py-4 rounded-lg transition-all duration-300">
                 Генерирай Видео
             </button>
 
-            <div id="emailSection" class="mt-8 pt-8 border-t border-white/10 hidden">
-                <p class="text-sm text-purple-300 mb-4 font-medium italic underline">Ти си сред първите! Остави имейл за ранен достъп:</p>
-                <input id="userEmail" type="email" placeholder="Твоят имейл..." 
-                       class="w-full p-3 rounded-lg bg-black border border-gray-700 text-white mb-3 focus:outline-none focus:border-pink-500">
-                <button onclick="saveEmail()" class="text-sm bg-white text-black font-bold py-2 px-6 rounded-full hover:bg-pink-500 hover:text-white transition-colors">
-                    Запиши ме
-                </button>
+            <div id="resultSection" class="mt-6 text-left hidden">
+                <p id="videoTitle" class="text-sm font-bold text-white mb-2"></p>
+                <p id="videoDuration" class="text-xs text-gray-400 mb-4"></p>
+                <div class="bg-purple-900/30 p-4 rounded-lg border border-purple-500/30">
+                    <p class="text-xs font-bold text-purple-300 uppercase mb-2 italic">AI Прогноза за виралност:</p>
+                    <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                        <div id="viralBar" class="bg-pink-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <p id="viralScore" class="text-right text-xs mt-1 text-pink-400 font-bold"></p>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-4 italic text-center">Имейлът ти е записан. Ще получиш клиповете скоро!</p>
             </div>
 
-            <p id="status" class="mt-4 text-purple-400 font-medium hidden"></p>
+            <p id="status" class="mt-4 text-purple-400 font-medium text-sm animate-pulse"></p>
         </div>
         
         <footer class="mt-20 text-gray-600 text-xs tracking-widest uppercase">
@@ -39,35 +43,51 @@
     </div>
 
     <script>
-        function startAI() {
+        async function analyzeVideo() {
             const link = document.getElementById('videoLink').value;
             const status = document.getElementById('status');
             const btn = document.getElementById('mainButton');
-            const emailSec = document.getElementById('emailSection');
+            const resultSection = document.getElementById('resultSection');
 
-            if (link.includes('youtube.com') || link.includes('youtu.be')) {
-                btn.disabled = true;
-                btn.innerText = "АНАЛИЗИРАНЕ...";
-                status.classList.remove('hidden');
-                status.innerText = "🤖 AI търси вирални моменти...";
-                
-                setTimeout(() => {
-                    btn.innerText = "ГОТОВО!";
-                    status.innerText = "✅ Намерихме 3 вирални клипа!";
-                    emailSec.classList.remove('hidden'); // Показваме полето за имейл
-                }, 2500);
-            } else {
+            if (!link.includes('youtube.com') && !link.includes('youtu.be')) {
                 alert("Моля, постави валиден YouTube линк!");
+                return;
             }
-        }
 
-        function saveEmail() {
-            const email = document.getElementById('userEmail').value;
-            if (email.includes('@')) {
-                alert("Успешно! Ще получиш известие веднага щом клиповете са готови за теглене.");
-                location.reload();
-            } else {
-                alert("Моля, въведи истински имейл.");
+            // Визуална подготовка
+            btn.disabled = true;
+            btn.innerText = "СВЪРЗВАНЕ С AI...";
+            status.classList.remove('hidden');
+            status.innerText = "🤖 Извличане на данни от видеото...";
+            resultSection.classList.add('hidden');
+
+            try {
+                // Изпращаме линка към твоето ново API
+                const response = await fetch(`/api/analyze?url=${encodeURIComponent(link)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    status.innerText = "✅ Анализът приключи!";
+                    btn.innerText = "ГЕНЕРИРАЙ ОТНОВО";
+                    btn.disabled = false;
+                    
+                    // Показваме резултатите от истинското видео
+                    resultSection.classList.remove('hidden');
+                    document.getElementById('videoTitle').innerText = "🎥 " + data.title;
+                    document.getElementById('videoDuration').innerText = "Продължителност: " + data.duration;
+                    document.getElementById('viralScore').innerText = data.viral_score;
+                    
+                    // Анимираме лентата на виралност
+                    setTimeout(() => {
+                        document.getElementById('viralBar').style.width = data.viral_score;
+                    }, 100);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                status.innerText = "❌ Грешка: Сървърът се събужда. Пробвай пак след 30 секунди.";
+                btn.disabled = false;
+                btn.innerText = "ПРОБВАЙ ПАК";
             }
         }
     </script>
