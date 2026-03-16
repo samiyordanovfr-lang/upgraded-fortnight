@@ -1,49 +1,92 @@
-const translations = {
-            bg: {
-                subtitle: "Превърни текста си във вирално видео.",
-                placeholder: "Опиши твоето видео...",
-                btn: "ГЕНЕРИРАЙ ВИДЕО С AI ✨",
-                result: "Готов сценарий и план:",
-                free: "БЕЗПЛАТЕН", pro: "PRO ТИТАН", buy: "КУПИ СЕГА", current: "Текущ план"
-            },
-            en: {
-                subtitle: "Turn text into viral videos instantly.",
-                placeholder: "Describe your video idea...",
-                btn: "GENERATE AI VIDEO ✨",
-                result: "AI Script & Plan:",
-                free: "FREE PLAN", pro: "PRO TITAN", buy: "BUY NOW", current: "Current Plan"
-            },
-            de: {
-                subtitle: "Verwandeln Sie Text sofort in virale Videos.",
-                placeholder: "Beschreiben Sie Ihre Videoidee...",
-                btn: "KI-VIDEO ERSTELLEN ✨",
-                result: "KI-Skript & Plan:",
-                free: "KOSTENLOS", pro: "PRO TITAN", buy: "JETZT KAUFEN", current: "Aktueller Plan"
-            },
-            fr: {
-                subtitle: "Transformez du texte en vidéos virales instantanément.",
-                placeholder: "Décrivez votre idée de vidéo...",
-                btn: "GÉNÉRER VIDÉO IA ✨",
-                result: "Script et Plan IA :",
-                free: "GRATUIT", pro: "PRO TITAN", buy: "ACHETER", current: "Plan actuel"
-            },
-            es: {
-                subtitle: "Convierte texto en videos virales al instante.",
-                placeholder: "Describe tu idea de video...",
-                btn: "GENERAR VIDEO IA ✨",
-                result: "Guión y Plan de IA:",
-                free: "GRATIS", pro: "PRO TITAN", buy: "COMPRAR AHORA", current: "Plan actual"
-            },
-            it: {
-                subtitle: "Trasforma il testo in video virali istantaneamente.",
-                placeholder: "Descrivi la tua idea per il video...",
-                btn: "GENERA VIDEO AI ✨",
-                result: "Script e Piano IA:",
-                free: "GRATUITO", pro: "PRO TITAN", buy: "ACQUISTA ORA", current: "Piano attuale"
-            }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClipMaster AI - Global Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; }
+        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    </style>
+</head>
+<body class="p-5">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 id="title" class="text-4xl font-bold mb-2 gradient-text">ClipMaster AI Pro</h1>
+        <p id="subtitle" class="text-gray-400 mb-8"></p>
+
+        <div class="card mb-8">
+            <textarea id="promptInput" class="w-full p-4 rounded bg-gray-900 border border-gray-700 mb-4" rows="4"></textarea>
+            <button onclick="generateVideo()" id="mainBtn" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded font-bold transition uppercase tracking-widest"></button>
+        </div>
+
+        <div id="result" class="hidden card text-left mb-8 border-blue-500/50">
+            <h3 id="resultTitle" class="font-bold text-xl mb-3">🎬</h3>
+            <div id="output" class="text-gray-300 space-y-2 mb-4"></div>
+            
+            <div id="videoContainer" class="hidden mt-4">
+                <video id="previewVideo" controls class="w-full rounded-lg border-2 border-blue-500 shadow-lg shadow-blue-500/20">
+                    <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+            <div class="card border-gray-700">
+                <h3 id="freeTitle" class="text-xl font-bold uppercase"></h3>
+                <p class="text-3xl font-bold my-4">$0 <span class="text-sm text-gray-400">/mo</span></p>
+                <button id="freeBtn" class="w-full border border-gray-600 p-2 rounded text-gray-400"></button>
+            </div>
+            <div class="card border-blue-500 scale-105 shadow-xl shadow-blue-500/20">
+                <h3 id="proTitle" class="text-xl font-bold text-blue-400 uppercase"></h3>
+                <p class="text-3xl font-bold my-4">$49 <span class="text-sm text-gray-400">/mo</span></p>
+                <button id="proBtn" class="w-full bg-blue-600 p-2 rounded font-bold"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            bg: { subtitle: "Превърни текста си във вирално видео.", placeholder: "Опиши твоето видео...", btn: "ГЕНЕРИРАЙ ВИДЕО С AI ✨", result: "Готов сценарий и план:", free: "БЕЗПЛАТЕН", pro: "PRO ТИТАН", buy: "КУПИ СЕГА", current: "Текущ план", loading: "Генериране..." },
+            en: { subtitle: "Turn text into viral videos instantly.", placeholder: "Describe your video idea...", btn: "GENERATE AI VIDEO ✨", result: "AI Script & Plan:", free: "FREE PLAN", pro: "PRO TITAN", buy: "BUY NOW", current: "Current Plan", loading: "Generating..." },
+            de: { subtitle: "Verwandeln Sie Text sofort in virale Videos.", placeholder: "Beschreiben Sie Ihre Videoidee...", btn: "KI-VIDEO ERSTELLEN ✨", result: "KI-Skript & Plan:", free: "KOSTENLOS", pro: "PRO TITAN", buy: "JETZT KAUFEN", current: "Aktueller Plan", loading: "Generierung..." },
+            fr: { subtitle: "Transformez du texte en vidéos virales instantanément.", placeholder: "Décrivez votre idée de vidéo...", btn: "GÉNÉRER VIDÉO IA ✨", result: "Script et Plan IA :", free: "GRATUIT", pro: "PRO TITAN", buy: "ACHETER", current: "Plan actuel", loading: "Génération..." },
+            es: { subtitle: "Convierte texto en videos virales al instante.", placeholder: "Describe tu idea de video...", btn: "GENERAR VIDEO IA ✨", result: "Guión y Plan de IA:", free: "GRATIS", pro: "PRO TITAN", buy: "COMPRAR AHORA", current: "Plan actual", loading: "Generando..." },
+            it: { subtitle: "Trasforma il testo in video virali istantaneamente.", placeholder: "Descrivi la tua idea per il video...", btn: "GENERA VIDEO AI ✨", result: "Script e Piano IA:", free: "GRATUITO", pro: "PRO TITAN", buy: "ACQUISTA ORA", current: "Piano attuale", loading: "Generando..." }
         };
 
-        // Засичане на езика (взема първите две букви, напр. 'de' от 'de-DE')
         const browserLang = navigator.language.split('-')[0];
-        const userLang = translations[browserLang] ? browserLang : 'en'; // Ако нямаме езика, пускаме английски
+        const userLang = translations[browserLang] ? browserLang : 'en';
         const t = translations[userLang];
+
+        document.getElementById('subtitle').innerText = t.subtitle;
+        document.getElementById('promptInput').placeholder = t.placeholder;
+        document.getElementById('mainBtn').innerText = t.btn;
+        document.getElementById('resultTitle').innerText += " " + t.result;
+        document.getElementById('freeTitle').innerText = t.free;
+        document.getElementById('proTitle').innerText = t.pro;
+        document.getElementById('freeBtn').innerText = t.current;
+        document.getElementById('proBtn').innerText = t.buy;
+
+        async function generateVideo() {
+            const btn = document.getElementById('mainBtn');
+            const prompt = document.getElementById('promptInput').value;
+            if(!prompt) return;
+
+            btn.innerText = t.loading;
+            btn.disabled = true;
+
+            const res = await fetch(`/api/analyze?url=${encodeURIComponent(prompt)}`);
+            const data = await res.json();
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('output').innerHTML = "<strong>Result:</strong> " + data.script + "<br><strong>Viral Score:</strong> " + data.viral_score;
+            document.getElementById('videoContainer').classList.remove('hidden');
+            
+            btn.innerText = t.btn;
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
