@@ -1,13 +1,14 @@
 export default function handler(req, res) {
-  const { url } = req.query;
-  let videoId = "YouTube Video";
-  if (url && url.includes('v=')) {
-    videoId = url.split('v=')[1].split('&')[0];
-  }
+  const { url } = req.query; // Това сега е нашият prompt (идея)
+  
+  const musicStyles = ["Cyberpunk Phonk", "Deep House", "Epic Cinematic", "Lo-Fi Study"];
+  const randomMusic = musicStyles[Math.floor(Math.random() * musicStyles.length)];
+
   res.status(200).json({
     success: true,
-    title: "Клип: " + videoId,
-    duration: "Готов за обработка",
-    viral_score: Math.floor(Math.random() * 10) + 85 + "%"
+    title: "Viral Video Idea: " + url.substring(0, 20) + "...",
+    script: "Сцена 1: Силен старт с визуализация на " + url + ". Сцена 2: Текстова анимация със статистика. Сцена 3: Call to action.",
+    music: randomMusic,
+    viral_score: Math.floor(Math.random() * 15) + 85 + "%"
   });
 }
