@@ -72,9 +72,9 @@
             btn.disabled = false;
             resDiv.classList.remove('hidden');
             
-            output.innerHTML = `<strong>Заглавие:</strong> \${data.title}<br><br>
-                               <strong>Сценарий:</strong> \${data.script}<br><br>
-                               <strong>Вирален потенциал:</strong> \${data.viral_score}`;
+            output.innerHTML = "<strong>Заглавие:</strong> " + data.title + "<br><br>" +
+                   "<strong>Сценарий:</strong> " + data.script + "<br><br>" +
+                   "<strong>Вирален потенциал:</strong> " + data.viral_score;
             document.getElementById('musicTag').innerText = data.music;
         }
     </script>
